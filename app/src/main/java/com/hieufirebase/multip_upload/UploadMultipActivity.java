@@ -48,6 +48,7 @@ public class UploadMultipActivity extends AppCompatActivity {
     private Button btnUpload;
 
     private TextView mTextView;
+//    private int k=0;
 
 
     @Override
@@ -81,26 +82,52 @@ public class UploadMultipActivity extends AppCompatActivity {
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                for (int i = 0; i < listNameImage.size(); i++) {
-//
-//                    final StorageReference fileToUpload = mStorage.child("Images").child(listNameImage.get(i));
-//
-//                    fileToUpload.putFile(listFileUri.get(i));
-//
-//                    fileToUpload.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                        @Override
-//                        public void onSuccess(Uri uri) {
-//                            listUriRespon.add(uri.toString());
-//                            Log.e("url", uri.toString() + "\n");
-//                        }
-//                    });
-//                }
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference databaseReference = database.getReference("Post");
-                Post post = new Post("linh linh", "bali that dep", listUriRespon);
-                databaseReference.push().setValue(post);
+
+
+                for (int i = 0; i < listNameImage.size(); i++) {
+
+                    final StorageReference fileToUpload = mStorage.child("Images").child(listNameImage.get(i));
+                    fileToUpload.putFile(listFileUri.get(i)).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            fileToUpload.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    listUriRespon.add(uri.toString());
+                                    Log.e("url", uri.toString() + "\n");
+
+                                    if (listUriRespon.size()==listNameImage.size()){
+                                      newPost();
+                                    }
+                                }
+                            });
+
+                        }
+                    });
+
+                }
+
+
             }
         });
+
+    }
+
+    private void newPost() {
+        Post post = new Post("linh ling", "Paris is beautiful");
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("Post");
+        final String id = myRef.push().getKey();
+        myRef.child(id).setValue(post);
+        DatabaseReference myRef2 = database.getReference("Post").child(id).child("Images");
+        int j = 0;
+        while (j < listUriRespon.size()) {
+            myRef2.push().setValue(listUriRespon.get(j));
+            j++;
+        }
+
 
     }
 
@@ -118,49 +145,20 @@ public class UploadMultipActivity extends AppCompatActivity {
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK) {
 
             if (data.getClipData() != null) {
-
                 int totalItemsSelected = data.getClipData().getItemCount();
-
                 for (int i = 0; i < totalItemsSelected; i++) {
-
                     Uri fileUri = data.getClipData().getItemAt(i).getUri();
-                    listFileUri.add(fileUri);
-
+                    this.listFileUri.add(fileUri);
                     final String fileName = getFileName(fileUri);
-                    listNameImage.add(fileName);
+                    this.listNameImage.add(fileName);
                     uploadListAdapter.notifyDataSetChanged();
-                    Log.e("data", data.getData() + "");
-
-//                    /*add  nhanh images firebase store*/
-//                    final StorageReference fileToUpload = mStorage.child("Images").child(fileName);
-//                    /* push image len nhanh images*/
-//                    fileToUpload.putFile(fileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                        @Override
-//                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//
-//                            fileToUpload.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                                @Override
-//                                public void onSuccess(Uri uri) {
-//                                    listUriRespon.add(uri.toString());
-//                                    Log.e("url",uri.toString()+"\n");
-//                                }
-//                            });
-//                        }
-//                    });
-
                 }
 
-                //Toast.makeText(MainActivity.this, "Selected Multiple Files", Toast.LENGTH_SHORT).show();
-
             } else if (data.getData() != null) {
-                listFileUri.add(data.getData());
+                this.listFileUri.add(data.getData());
                 final String fileName = getFileName(data.getData());
-
+                this.listNameImage.add(fileName);
                 uploadListAdapter.notifyDataSetChanged();
-
-
-//                Toast.makeText(this, "Selected Single File", Toast.LENGTH_SHORT).show();
-                Log.e("data", data.getData() + "");
 
             }
 
