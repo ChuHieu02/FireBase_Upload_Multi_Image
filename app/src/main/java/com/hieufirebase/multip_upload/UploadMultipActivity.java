@@ -1,6 +1,7 @@
 package com.hieufirebase.multip_upload;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
@@ -25,6 +27,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.hieufirebase.R;
 import com.hieufirebase.model.Post;
+import com.hieufirebase.postService.ExampleService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +39,10 @@ public class UploadMultipActivity extends AppCompatActivity {
     private RecyclerView mUploadList;
 
     private List<String> listPathFile = new ArrayList<>();
-    private List<String> listUriRespon = new ArrayList<>();
 
-    private List<String> listNameImage = new ArrayList<>();
-    private List<Uri> listFileUri = new ArrayList<Uri>();
+    private ArrayList<String> listUriRespon = new ArrayList<>();
+    private ArrayList<String> listNameImage = new ArrayList<>();
+    private ArrayList<Uri> listFileUri = new ArrayList<>();
 
     private UploadListAdapter uploadListAdapter;
 
@@ -56,10 +59,10 @@ public class UploadMultipActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_multip);
 
+
         mapping();
         mStorage = FirebaseStorage.getInstance().getReference();
 
-        //RecyclerView
 
         mUploadList.setHasFixedSize(true);
         mUploadList.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
@@ -82,33 +85,11 @@ public class UploadMultipActivity extends AppCompatActivity {
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                for (int i = 0; i < listNameImage.size(); i++) {
-
-                    final StorageReference fileToUpload = mStorage.child("Images").child(listNameImage.get(i));
-                    fileToUpload.putFile(listFileUri.get(i)).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                            fileToUpload.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    listUriRespon.add(uri.toString());
-                                    Log.e("url", uri.toString() + "\n");
-
-                                    if (listUriRespon.size()==listNameImage.size()){
-                                      newPost();
-                                    }
-                                }
-                            });
-
-                        }
-                    });
-
-                }
-
+                Intent serviceIntent = new Intent(UploadMultipActivity.this, ExampleService.class);
+                serviceIntent.putStringArrayListExtra("listNameImage",listNameImage);
+                serviceIntent.putParcelableArrayListExtra("listFileUri", listFileUri);
+                serviceIntent.putStringArrayListExtra("listUriRespon", listUriRespon);
+                ContextCompat.startForegroundService(UploadMultipActivity.this, serviceIntent);
 
             }
         });

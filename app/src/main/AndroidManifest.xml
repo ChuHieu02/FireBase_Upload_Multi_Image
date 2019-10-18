@@ -3,8 +3,11 @@
     package="com.hieufirebase">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"></uses-permission>
 
     <application
+        android:name=".postService.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -20,6 +23,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".UploadActivity" />
+        <service android:name=".postService.ExampleService"></service>
+
     </application>
 
 </manifest>

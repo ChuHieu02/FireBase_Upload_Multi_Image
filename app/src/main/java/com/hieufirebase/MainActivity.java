@@ -12,8 +12,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+import com.hieufirebase.postService.ExampleService;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int RC_STORAGE_PERMS1 = 101;
     private static final int RC_STORAGE_PERMS2 = 102;
     private int hasWriteExtStorePMS;
@@ -102,4 +105,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
+
+
 }
