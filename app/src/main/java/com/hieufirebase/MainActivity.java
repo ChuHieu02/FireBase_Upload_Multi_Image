@@ -28,6 +28,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_upload).setOnClickListener(this);
         findViewById(R.id.btn_download).setOnClickListener(this);
         findViewById(R.id.btn_cloud_storage).setOnClickListener(this);
+
+        boolean check = true;
+        boolean check1 = false;
+        findViewById(R.id.btn_cloud_storage).setVisibility(check ? View.VISIBLE : (check1 ? View.GONE : View.INVISIBLE));
     }
 
     @Override
@@ -42,21 +46,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
 //                        startActivity(new Intent(this, DownloadActivity.class));
                     }
-                } else {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(this);
-                    alert.setMessage("You need to allow permission");
-                    alert.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                            intent.setData(Uri.parse("package:" + getPackageName()));
-                            startActivityForResult(intent, requestCode);
-                        }
-                    });
-                    alert.setCancelable(false);
-                    alert.show();
+                    return;
                 }
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setMessage("You need to allow permission");
+                alert.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setData(Uri.parse("package:" + getPackageName()));
+                        startActivityForResult(intent, requestCode);
+                    }
+                });
+                alert.setCancelable(false);
+                alert.show();
                 break;
         }
     }
